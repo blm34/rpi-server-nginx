@@ -1,0 +1,24 @@
+services:
+  nginx:
+    container_name: nginx
+    image: 'jc21/nginx-proxy-manager:latest'
+    restart: unless-stopped
+    ports:
+      - '80:80' # Public HTTP Port
+      - '443:443' # Public HTTPS Port
+      - '81:81' # Admin Web Port
+
+    environment:
+      DB_SQLITE_FILE: "/data/database.sqlite"
+
+    volumes:
+      - ./data:/data
+      - ./letsencrypt:/etc/letsencrypt
+    networks:
+      - nginx-proxy-net
+
+networks:
+  nginx-proxy-net:
+    external: false
+    name: nginx-proxy-net
+    
