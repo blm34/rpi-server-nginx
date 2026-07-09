@@ -1,7 +1,7 @@
 services:
   nginx:
     container_name: nginx
-    image: 'nginxproxy/nginx-proxy'
+    image: 'nginxproxy/nginx-proxy:1.11'
     restart: unless-stopped
     ports:
       - '80:80' # Public HTTP Port
@@ -17,7 +17,7 @@ services:
 
   nginx-acme:
     container_name: nginx-acme
-    image: 'nginxproxy/acme-companion'
+    image: 'nginxproxy/acme-companion:2.7'
     restart: unless-stopped
     depends_on:
       - "nginx"
