@@ -1,19 +1,32 @@
 services:
   nginx:
     container_name: nginx
-    image: 'jc21/nginx-proxy-manager:latest'
+    image: 'nginxproxy/nginx-proxy'
     restart: unless-stopped
     ports:
       - '80:80' # Public HTTP Port
       - '443:443' # Public HTTPS Port
-      # - '81:81' # Admin Web Port
-
-    environment:
-      DB_SQLITE_FILE: "/data/database.sqlite"
-
     volumes:
-      - ./data:/data
-      - ./letsencrypt:/etc/letsencrypt
+      - ./data/certs:/etc/nginx/certs
+      - ./data/html:/usr/share/nginx/html
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    labels:
+      - com.github.nginx-proxy.nginx
+    networks:
+      - nginx-proxy-net
+
+  nginx-acme:
+    container_name: nginx-acme
+    image: 'nginxproxy/acme-companion'
+    restart: unless-stopped
+    depends_on:
+      - "nginx"
+    environment:
+      DEFAULT_EMAIL: ${EMAIL}
+    volumes:
+      - ./data/certs:/etc/nginx/certs
+      - ./data/html:/usr/share/nginx/html
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
       - nginx-proxy-net
 
@@ -21,4 +34,3 @@ networks:
   nginx-proxy-net:
     external: false
     name: nginx-proxy-net
-    
